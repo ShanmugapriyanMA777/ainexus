@@ -220,6 +220,22 @@ const mockSupabase = {
     },
     resetPasswordForEmail: async (email: string) => {
       return { data: {}, error: null };
+    },
+    signInWithOAuth: async ({ provider }: { provider: 'google' | 'github' }) => {
+      console.log('Mock OAuth signin with', provider);
+      // Simulate success callback
+      const user = {
+        id: 'mock-user-123',
+        full_name: 'Alex Developer',
+        email: 'alex@nexus.ai',
+        avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&h=150&q=80',
+        is_admin: true,
+        created_at: new Date().toISOString(),
+      };
+      const session = { access_token: 'mock-jwt-token', user };
+      localStorage.setItem(STORAGE_PREFIX + 'active-session', JSON.stringify({ user, expires_at: Date.now() + 86400000 }));
+      mockAuthCallbacks.forEach((cb) => cb('SIGNED_IN', session));
+      return { data: { provider, url: '/' }, error: null };
     }
   },
   from: (table: string) => {

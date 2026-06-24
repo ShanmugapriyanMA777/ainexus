@@ -188,6 +188,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const signInWithOAuth = async (provider: 'google' | 'github') => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+      });
+      return { error };
+    } catch (err: any) {
+      return { error: err };
+    }
+  };
+
   const updateProfile = async (updates: Partial<Profile>) => {
     if (!user) return { error: new Error('User not logged in') };
     try {
@@ -213,6 +224,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isDemo: isMockClient,
         signUp,
         signIn,
+        signInWithOAuth,
         signOut,
         resetPassword,
         updateProfile,

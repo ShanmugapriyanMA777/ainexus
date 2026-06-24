@@ -8,7 +8,7 @@ type AuthMode = 'login' | 'signup' | 'forgot';
 
 const AuthPage: React.FC = () => {
   const navigate = useNavigate();
-  const { signIn, signUp, resetPassword, isDemo } = useAuth();
+  const { signIn, signUp, signInWithOAuth, resetPassword, isDemo } = useAuth();
 
   const [mode, setMode] = useState<AuthMode>('login');
   const [email, setEmail] = useState('');
@@ -48,8 +48,21 @@ const AuthPage: React.FC = () => {
     }
   };
 
-  const handleOAuthLogin = (provider: 'google' | 'github') => {
-    setError(`OAuth auth is running in local development mode. Click "Launch Demo Sandbox Session" to explore the platform immediately!`);
+  const handleOAuthLogin = async (provider: 'google' | 'github') => {
+    setError(null);
+    setSubmitting(true);
+    try {
+      const { error } = await signInWithOAuth(provider);
+      if (error) throw error;
+      if (isDemo) {
+        window.location.href = '/';
+      }
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || 'OAuth authentication failed.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleLaunchSandbox = async () => {
